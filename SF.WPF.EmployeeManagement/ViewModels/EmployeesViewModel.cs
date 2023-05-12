@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,8 +10,15 @@ using SF.WPF.EmployeeManagement.Models;
 
 namespace SF.WPF.EmployeeManagement.ViewModels
 {
-    class EmployeesViewModel
+    class EmployeesViewModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         private EmployeeRepository _employeeRepository;
 
         public EmployeesViewModel()
@@ -29,6 +37,7 @@ namespace SF.WPF.EmployeeManagement.ViewModels
             set
             {
                 _employees = value;
+                OnPropertyChanged();
             }
         }
 
@@ -43,6 +52,22 @@ namespace SF.WPF.EmployeeManagement.ViewModels
             {
                 _filter = value;
                 FillListView();
+                FillFilterMessage();
+            }
+        }
+
+        private string _filterMessage;
+
+        public string FilterMessage
+        {
+            get
+            {
+                return _filterMessage;
+            }
+            set
+            {
+                _filterMessage = value;
+                OnPropertyChanged();
             }
         }
 
@@ -50,13 +75,25 @@ namespace SF.WPF.EmployeeManagement.ViewModels
         {
             if (!String.IsNullOrEmpty(_filter))
             {
-                _employees =
+                Employees =
                     new ObservableCollection<Employee>(_employeeRepository.GetAll()
                         .Where(v => v.FirstName.Contains(_filter)));
             }
             else
-                _employees = new ObservableCollection<Employee>(
+                Employees = new ObservableCollection<Employee>(
                     _employeeRepository.GetAll());
+        }
+
+        private void FillFilterMessage()
+        {
+            if (!String.IsNullOrEmpty(_filter))
+            {
+                FilterMessage = "По вашему запросу найдено: " + Employees.Count().ToString();
+            }
+            else
+            {
+                FilterMessage = "Введите данные для поиска";
+            }
         }
     }
 }
