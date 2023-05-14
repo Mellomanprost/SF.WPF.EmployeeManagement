@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SF.WPF.EmployeeManagement.Models
 {
-    public class EmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         private readonly List<Employee> _employees = new List<Employee>();
 

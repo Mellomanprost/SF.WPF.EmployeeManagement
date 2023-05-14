@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using SF.WPF.EmployeeManagement.Models;
+using SF.WPF.EmployeeManagement.ViewModels;
 
 namespace SF.WPF.EmployeeManagement.Views
 {
@@ -20,9 +21,15 @@ namespace SF.WPF.EmployeeManagement.Views
     /// </summary>
     public partial class EmployeesView : Window
     {
-        public EmployeesView()
+        private IEmployeeViewModel _employeeViewModel;
+        private IEmployeesViewModel _employeesViewModel;
+        public EmployeesView(IEmployeesViewModel employeesViewModel, IEmployeeViewModel employeeViewModel)
         {
+            _employeeViewModel = employeeViewModel;
+            _employeesViewModel = employeesViewModel;
+
             InitializeComponent();
+            DataContext = _employeesViewModel;
         }
 
         private void ListView_OnPreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -35,8 +42,11 @@ namespace SF.WPF.EmployeeManagement.Views
             }
 
             var employee = item as Employee;
+            _employeeViewModel.Employee = employee;
 
-            MessageBox.Show($"{employee.FirstName} {employee.LastName} {employee.Age} {employee.CompanyName} {employee.Position} {employee.CityName}");
+            var employeeView = new EmployeeView(_employeeViewModel);
+
+            employeeView.Show();
         }
     }
 }
